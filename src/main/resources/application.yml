@@ -1,0 +1,42 @@
+---
+server:
+  port: 8080
+  contextPath: /
+---
+spring:
+  profiles: local, default
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    hibernate:
+      ddl-auto: none
+
+  datasource:
+    jdbcUrl: jdbc:oracle:thin:@10.236.172.105:1521:RPPNRTS
+    username: RPP_BACK_OFFICE
+    # password: ENC(FmwB9CRi/dosV94ubt+0FisBNWhXHuai)
+    password: RPP_BACK_OFFICE
+    driver-class-name: oracle.jdbc.OracleDriver
+    poolname: boPool
+    maximumPoolSize: 5  
+  main: 
+      allow-circular-references: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+ 
+      
+api:
+  encryptfile: uid.txt
+  checksumfile: chksum.txt
+
+
+jwt:
+   secret: rppapigw
+   
+   
+
+  
+  
