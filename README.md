@@ -1,5 +1,5 @@
 # README #
-Paynet Java Assessment -  Assigment 2
+Java Assigment Task -  Springboot Rest Api (POC)
 
 ### Requirement ###
  
@@ -29,7 +29,7 @@ Paynet Java Assessment -  Assigment 2
 * mvn clean install -DskipTest //to build
 * mvn spring-boot:run  //run
 * swagger -> http://localhost:8080/swagger-ui.html
-* demo page -> http://localhost:8080/
+
 
 
 Note: 
@@ -39,8 +39,8 @@ Ensure API_SIGNSTUREKE in table BANK are same in jwt.secret in application.yml
 MOD-Header to spoog Authorization header, value token without "<content>"
 
 ### JWT ###
-* first have to insert user & password to allow token generation ( Since the user n password is retrive from db [enhancement])
-* to do a request, first generate token @(http://localhost:8080/authenticate) refer Generate JWT token section.
+* create application table and insert user & password to allow token generation ( Since the user n password is retrive from db ) refer _appdb.sql
+* to do a request, first generate token @(http://localhost:8080/api/v1/authenticate) refer Generate JWT token section.
 * each request should have request header as below:
               * Header Name :Authorization
               * Header Content: Bearer <jwt token generate>
@@ -56,13 +56,19 @@ MOD-Header to spoog Authorization header, value token without "<content>"
     }
     
     Response:
-    {
-    "token":  	"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZWNoZ2Vla25leHQiLCJleHAiOjE2NDQ4NTQzNDAsImlhdCI6MTY0NDgzNjM0MH0.4UNDaoHr_zlDY	Mcyrr-9aq3e#####-D9yuu5Vc84RhN5ElN4BVmxiKtLfYvJ0rAHcPC9Y9X72PRhzdCHPJ6ZTtj3Ocw"
+    "user": {
+    "id": 1,
+    "username": "100002089",
+    "password": "zurich123",
+    "token": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMDAwMDIwODkiLCJleHAiOjE3MjEwNDExNTYsImlhdCI6MTcyMTAyMzE1Nn0.sbdK_NXpOcLUSzVOJs9D0-6Qpes5AA7aGZC8C9f6E0mbg70KbomnxCy6UWQhva851_YCAtczr9cQehFXqByZAg",
+    "createDate": "2024-07-15T05:59:16.000+00:00",
+    "updateDate": "2024-07-15T05:59:16.000+00:00",
+    "issueDate": "2024-07-15T05:59:16.000+00:00",
+    "expiredDate": "2024-07-15T10:59:16.000+00:00"
     }
-    
-    
+  
     OR
-    curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' -d '{ "username": "norirman","password": "password" }' 'http://localhost:8080/authenticate'
+    curl -X POST "http://localhost:8080/api/v1/authenticate" -H "accept: */*" -H "Content-Type: application/json" -d "{ \"password\": \"zurich123\", \"username\": \"100002089\"}"
     
 
 

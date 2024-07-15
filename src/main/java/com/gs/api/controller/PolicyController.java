@@ -9,13 +9,15 @@
 package com.gs.api.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.http.HttpStatus;
 import com.gs.api.db.entity.Policy;
 import com.gs.api.db.entity.RequestProcess;
 import com.gs.api.db.repositories.PolicyRepository;
@@ -25,7 +27,10 @@ import com.gs.api.service.PriceService;
 import com.gs.api.vo.model.Product;
 import com.gs.api.vo.model.ProductPolicy;
 import com.gs.api.vo.request.IssuePolicyRequest;
+import com.gs.api.vo.response.Response;
+import com.gs.api.vo.response.ResponseTokenDetail;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -85,9 +90,10 @@ public class PolicyController {
     }
 	
 	@GetMapping("/policy/getActivePolicy")
-    public List<RequestProcess> getActivePolicyList() {
-
-        return requestRepository.findByStatus("COMPLETED");
+    public ResponseEntity<?>  getActivePolicyList() {
+    List<Policy> rr=  new ArrayList<>();
+       rr= policyRepository.findByStatus("ACTV");
+        return ResponseEntity.ok(rr);
     }
 	
 }

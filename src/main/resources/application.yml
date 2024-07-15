@@ -34,7 +34,7 @@ api:
 
 
 jwt:
-   secret: rppapigw
+   secret: secretkey
    
    
 
