@@ -11,16 +11,16 @@ Java Assigment Task -  Springboot Rest Api (POC)
 
 ### Situation ###
 
-* Load country data from external api (https://restcountries.eu/rest/v2)
-* create api to access the data save in database , CRUD functionality
+* Front end to call a backend service to submit a policy
+* Api provided and product pricing enquiry and issue policy interface
+* Issue policy will be a request to core system component
 
 
 ### Technology Stack Used ###
 
 * Springboot , hibernate,JPA (backend)
-* Front-End (AngularJs,freemaker)
 * Swagger
-* db mysql
+* ORM db (im using oracle)
 
 
 ### How to run###
