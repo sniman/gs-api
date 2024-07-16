@@ -3,12 +3,12 @@ Java Assigment Task -  Springboot Rest Api (POC)
 
 ### Requirement ###
  
- * identify any publicly available service exposing REST API that returns data in JSON format
- * Issue one or more suitable GET requests to the relevant API endpoints to retrieve a small subset of the full dataset retrievable from that service.
- * Create a schema for a database table to hold this small data subset.
- * Design a REST API that is exposed by the app to that is capable of processing HTTP POST and GET methods. The GET simply returns the entire contents of the database table,while the POST provides information for appending a new record into the table.
- * Create a simple application client that can issue these GET and POST requests to test your REST API. Data returned from the GET request should be viewable by the user. Data for the POST requests can be obtained interactively from the user via the command line, from a HTML/JSP page or from a hardcoded JSON/text file.
-
+ * Create backend API services 
+ * API should be protected with proper authentication and authorization
+ * API should be able to handle request concurrently without having impact on the service performance
+ * API should be able to handle a component down time scenario
+ 
+ 
 ### Situation ###
 
 * Front end to call a backend service to submit a policy
