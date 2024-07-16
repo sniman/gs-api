@@ -57,7 +57,7 @@ public class PolicyController {
      * this is store and foward approach.Request are put in a message/cache and will be pickup by other 
      * process
      */
-	@RequestMapping(value = "/policy/issue", method = RequestMethod.POST)
+	@RequestMapping(value = "/policies/issue", method = RequestMethod.POST)
 	public CompletableFuture<ProductPolicy> issuePolicy(@RequestBody IssuePolicyRequest issuePolicyRequest)
 			throws Exception {
 		
@@ -66,14 +66,14 @@ public class PolicyController {
 		
 	}
 
-	@GetMapping("/policy/enquiry")
+	@GetMapping("/policies/enquiry/{policyId}")
     public Policy policyEnquiry(
-            @RequestParam String policyId) {
+    		@PathVariable String policyId) {
         
         return policyService.findPolicyById(policyId);
     }
 	
-	@GetMapping("/policy/quotation")
+	@GetMapping("/policies/quotation")
     public Product pricingEnquiry(
             @RequestParam String productType,
             @RequestParam int age,
@@ -89,21 +89,21 @@ public class PolicyController {
         return new Product(productType, price,"Success");
     }
 	
-	@GetMapping("/policy/active")
+	@GetMapping("/policies/active")
     public ResponseEntity<?>  getActivePolicyList() {
 	List<Policy> rr=  new ArrayList<>();
        rr= policyService.getAllActivePolicy();
         return ResponseEntity.ok(rr);
     }
 	
-	@DeleteMapping(value = "/policy/delete/{policyId}")
+	@DeleteMapping(value = "/policies/delete/{policyId}")
 	public ResponseEntity<?> deletePolicy(@PathVariable String policyId) {
 		System.out.println("Deleting :"+ policyId);
 		policyService.deletePolicy(policyId);
 	    return new ResponseEntity<>("Policy is deleted successfully", HttpStatus.OK);
 	}
 	
-	@PutMapping("/policy/update/{policyId}")
+	@PutMapping("/policies/update/{policyId}")
 	public ResponseEntity<Object> updatePolicy(@RequestBody UpdatePolicyRequest updatePolicyRequest) {
 		policyService.updatePolicy(updatePolicyRequest);
 	    return new ResponseEntity<>("User is updated successfully", HttpStatus.OK);

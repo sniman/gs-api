@@ -52,6 +52,11 @@ public class PolicyService {
 
 			// get price
 			price = priceService.calculatePrice(productType, Integer.parseInt(age), Double.parseDouble(healthStatus));
+			
+			 if (price == -1) {
+
+		            throw new ResourceNotFoundException("Invalid product type " + productType);
+		        }
 
 			// Generate policy ID
 			long timestamp = System.currentTimeMillis();
