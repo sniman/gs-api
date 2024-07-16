@@ -33,13 +33,13 @@ public class NotificationService {
      */
     public void notifyClient() {
     	List <RequestProcess> notifyList = requestRepository.findByStatus("COMPLETED");
-    	
+    	System.out.println("Start notifying client");
     	//client webhock uri
         String clientEndpoint = "http://client.domain.com/notify"; // 
 
-        
         for(RequestProcess request : notifyList) {
         	restTemplate.postForEntity(clientEndpoint, request.getMessage(), String.class);
+       
         }
        
     }

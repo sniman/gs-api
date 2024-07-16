@@ -11,7 +11,10 @@ package com.gs.api.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,11 +25,13 @@ import com.gs.api.db.entity.Policy;
 import com.gs.api.db.entity.RequestProcess;
 import com.gs.api.db.repositories.PolicyRepository;
 import com.gs.api.db.repositories.RequestProcessRepository;
+import com.gs.api.exception.ResourceNotFoundException;
 import com.gs.api.service.PolicyService;
 import com.gs.api.service.PriceService;
 import com.gs.api.vo.model.Product;
 import com.gs.api.vo.model.ProductPolicy;
 import com.gs.api.vo.request.IssuePolicyRequest;
+import com.gs.api.vo.request.UpdatePolicyRequest;
 import com.gs.api.vo.response.Response;
 import com.gs.api.vo.response.ResponseTokenDetail;
 
@@ -45,11 +50,6 @@ public class PolicyController {
     @Autowired
     private PriceService priceService;
     
-    @Autowired
-    private RequestProcessRepository requestRepository;
-    
-    @Autowired
-    private PolicyRepository policyRepository;
 
 
     
@@ -57,7 +57,7 @@ public class PolicyController {
      * this is store and foward approach.Request are put in a message/cache and will be pickup by other 
      * process
      */
-	@RequestMapping(value = "/policy/issuePolicy", method = RequestMethod.POST)
+	@RequestMapping(value = "/policy/issue", method = RequestMethod.POST)
 	public CompletableFuture<ProductPolicy> issuePolicy(@RequestBody IssuePolicyRequest issuePolicyRequest)
 			throws Exception {
 		
@@ -69,12 +69,11 @@ public class PolicyController {
 	@GetMapping("/policy/enquiry")
     public Policy policyEnquiry(
             @RequestParam String policyId) {
-
         
-        return policyRepository.findByPolicyId(policyId);
+        return policyService.findPolicyById(policyId);
     }
 	
-	@GetMapping("/policy/getQuotation")
+	@GetMapping("/policy/quotation")
     public Product pricingEnquiry(
             @RequestParam String productType,
             @RequestParam int age,
@@ -83,17 +82,31 @@ public class PolicyController {
         double price = priceService.calculatePrice(productType, age, healthStatus);
         
         if (price == -1) {
-            throw new IllegalArgumentException("Invalid product type");
+
+            throw new ResourceNotFoundException("Invalid product type " + productType);
         }
         
         return new Product(productType, price,"Success");
     }
 	
-	@GetMapping("/policy/getActivePolicy")
+	@GetMapping("/policy/active")
     public ResponseEntity<?>  getActivePolicyList() {
-    List<Policy> rr=  new ArrayList<>();
-       rr= policyRepository.findByStatus("ACTV");
+	List<Policy> rr=  new ArrayList<>();
+       rr= policyService.getAllActivePolicy();
         return ResponseEntity.ok(rr);
     }
+	
+	@DeleteMapping(value = "/policy/delete/{policyId}")
+	public ResponseEntity<?> deletePolicy(@PathVariable String policyId) {
+		System.out.println("Deleting :"+ policyId);
+		policyService.deletePolicy(policyId);
+	    return new ResponseEntity<>("Policy is deleted successfully", HttpStatus.OK);
+	}
+	
+	@PutMapping("/policy/update/{policyId}")
+	public ResponseEntity<Object> updatePolicy(@RequestBody UpdatePolicyRequest updatePolicyRequest) {
+		policyService.updatePolicy(updatePolicyRequest);
+	    return new ResponseEntity<>("User is updated successfully", HttpStatus.OK);
+	}
 	
 }
