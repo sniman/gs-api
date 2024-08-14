@@ -15,6 +15,8 @@ import org.springframework.web.client.RestTemplate;
 import com.gs.api.db.entity.RequestProcess;
 import com.gs.api.db.repositories.RequestProcessRepository;
 
+import io.github.resilience4j.retry.annotation.Retry;
+
 @Service
 public class NotificationService {
 
@@ -31,6 +33,7 @@ public class NotificationService {
     /*
      * to notify success create policy 
      */
+    @Retry(name = "myRetry")
     public void notifyClient() {
     	List <RequestProcess> notifyList = requestRepository.findByStatus("COMPLETED");
     	System.out.println("Start notifying client");

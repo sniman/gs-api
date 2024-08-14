@@ -28,4 +28,12 @@ public class GlobalExceptionHandler {
         ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+    
+    @ExceptionHandler(UserAuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleGlobalException(UserAuthenticationException ex, WebRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(LocalDateTime.now(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+    
+    
 }

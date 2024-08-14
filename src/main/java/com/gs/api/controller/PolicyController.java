@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -57,36 +58,54 @@ public class PolicyController {
      * this is store and foward approach.Request are put in a message/cache and will be pickup by other 
      * process
      */
+//	@RequestMapping(value = "/policies/issue", method = RequestMethod.POST)
+//	public CompletableFuture<ProductPolicy> issuePolicy(@RequestBody IssuePolicyRequest issuePolicyRequest)
+//			throws Exception {
+//		
+//	    //String policyHolderName, String productType,String age,String healthStatus
+//		return policyService.issuePolicy(issuePolicyRequest.getPolicyHolderName(), issuePolicyRequest.getProductType(),issuePolicyRequest.getAge(),issuePolicyRequest.getHealthStatus());
+//		
+//	}
 	@RequestMapping(value = "/policies/issue", method = RequestMethod.POST)
-	public CompletableFuture<ProductPolicy> issuePolicy(@RequestBody IssuePolicyRequest issuePolicyRequest)
+	public ResponseEntity<ProductPolicy> issuePolicy(@RequestBody IssuePolicyRequest issuePolicyRequest)
 			throws Exception {
 		
-	    //String policyHolderName, String productType,String age,String healthStatus
-		return policyService.issuePolicy(issuePolicyRequest.getPolicyHolderName(), issuePolicyRequest.getProductType(),issuePolicyRequest.getAge(),issuePolicyRequest.getHealthStatus());
+		CompletableFuture<ProductPolicy> policyFuture = policyService.issuePolicy(
+                issuePolicyRequest.getPolicyHolderName(),
+                issuePolicyRequest.getProductType(),
+                issuePolicyRequest.getAge(),
+                issuePolicyRequest.getHealthStatus()
+        );
 		
+//		 // Non-blocking waiting for the future to complete
+//		policyFuture.thenRun(() -> System.out.println("Task completion"));
+
+		 
+       return ResponseEntity.accepted().body(policyFuture.get());
 	}
 
 	@GetMapping("/policies/enquiry/{policyId}")
-    public Policy policyEnquiry(
+    public ResponseEntity<Policy> policyEnquiry(
     		@PathVariable String policyId) {
         
-        return policyService.findPolicyById(policyId);
+		Policy policy= policyService.findPolicyById(policyId);
+		return new ResponseEntity<>(policy, HttpStatus.OK);
     }
 	
 	@GetMapping("/policies/quotation")
-    public Product pricingEnquiry(
+    public ResponseEntity<Product> pricingEnquiry(
             @RequestParam String productType,
             @RequestParam int age,
             @RequestParam double healthStatus) {
        		
-        double price = priceService.calculatePrice(productType, age, healthStatus);
+		double price = priceService.calculatePrice(productType, age, healthStatus);
         
         if (price == -1) {
-
             throw new ResourceNotFoundException("Invalid product type " + productType);
         }
         
-        return new Product(productType, price,"Success");
+        Product product = new Product(productType, price, "Success");
+        return new ResponseEntity<>(product, HttpStatus.OK);
     }
 	
 	@GetMapping("/policies/active")
@@ -104,9 +123,15 @@ public class PolicyController {
 	}
 	
 	@PutMapping("/policies/update/{policyId}")
-	public ResponseEntity<Object> updatePolicy(@RequestBody UpdatePolicyRequest updatePolicyRequest) {
-		policyService.updatePolicy(updatePolicyRequest);
+	public ResponseEntity<Object> updatePolicy(@PathVariable String policyId,@RequestBody UpdatePolicyRequest updatePolicyRequest) {
+		policyService.updatePolicy(policyId,updatePolicyRequest);
 	    return new ResponseEntity<>("User is updated successfully", HttpStatus.OK);
 	}
+	
+	 @PatchMapping("/policies/update/{policyId}")
+	    public ResponseEntity<String> patchPolicy(@PathVariable String policyId, @RequestBody UpdatePolicyRequest updatePolicyRequest) {
+	        policyService.patchPolicy(policyId, updatePolicyRequest);
+	        return new ResponseEntity<>("Policy is updated successfully", HttpStatus.OK);
+	    }
 	
 }

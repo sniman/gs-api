@@ -35,7 +35,7 @@ public class WebController {
 		return page;
 	}
 	
-	@RequestMapping(value = "/Paynet", method = RequestMethod.GET)
+	@RequestMapping(value = "/domain", method = RequestMethod.GET)
 	public ModelAndView redirectToPaynet() {
 	    return new ModelAndView("redirect:http://www.domain.my" );
 	}

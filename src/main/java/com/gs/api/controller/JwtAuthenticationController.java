@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.gs.api.db.entity.AuthUser;
 import com.gs.api.db.repositories.AuthUserRepository;
+import com.gs.api.exception.UserAuthenticationException;
 import com.gs.api.security.JwtTokenUtil;
 import com.gs.api.util.CustomError;
 import com.gs.api.vo.request.AuthenticationRequest;
@@ -96,15 +97,17 @@ public class JwtAuthenticationController {
 	}
 
 	private void authenticate(String username, String password) throws Exception {
+		            
 		Objects.requireNonNull(username);
 		Objects.requireNonNull(password);
 		try {
 			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 		} catch (DisabledException e) {
-			throw new Exception("USER_DISABLED", e);
+			throw new UserAuthenticationException("USER_DISABLED");
 		} catch (BadCredentialsException e) {
-			throw new Exception("INVALID_CREDENTIALS", e);
+			throw new UserAuthenticationException("INVALID_CREDENTIALS");
 		}
+		
 	}
 	
 	@RequestMapping(value = "/token", method = RequestMethod.POST)
@@ -113,11 +116,15 @@ public class JwtAuthenticationController {
 		logger.info("Retriving token :{}",request.getToken());
 		AuthUser usr= userRepository.findByToken(request.getToken());
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMdd hh:mm:ss");  
-
-		if (usr == null) {
-			//logger.error("User with token {} not found.", request.getToken().toString());
-			return new ResponseEntity(new CustomError("User with token " + request.getToken() + " not found"), HttpStatus.NOT_FOUND);
-		}
+		System.out.println("######:"+usr.getUsername());
+//
+//		if (usr == null) {
+//			//logger.error("User with token {} not found.", request.getToken().toString());
+//			return new ResponseEntity(new CustomError("User with token " + request.getToken() + " not found"), HttpStatus.NOT_FOUND);
+//		     //throw new UserAuthenticationException("Invalid PIN. The PIN must be a 4-digit number.");
+//		}
+//		
+		
 		ResponseTokenDetail response = new ResponseTokenDetail();
 		String strexpiredDate = formatter.format(usr.getExpiredDate());  
 		String strissuedDate = formatter.format(usr.getIssueDate());  

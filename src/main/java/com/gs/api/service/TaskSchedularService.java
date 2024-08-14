@@ -23,11 +23,11 @@ public class TaskSchedularService {
 
 
 	// runs every 5min
-    @Scheduled(fixedRate = 350000) 
-    public void reportCompletedRequests() {
-        List<RequestProcess> completedRequests = requestRepository.findByStatus("COMPLETED");
-        completedRequests.forEach(request -> 
-            System.out.println("Completed Request: " + request)
-        );
-    }
+//    @Scheduled(fixedRate = 350000) 
+//    public void reportCompletedRequests() {
+//        List<RequestProcess> completedRequests = requestRepository.findByStatus("COMPLETED");
+//        completedRequests.forEach(request -> 
+//            System.out.println("Completed Request: " + request)
+//        );
+//    }
 }

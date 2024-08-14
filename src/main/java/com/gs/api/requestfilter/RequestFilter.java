@@ -45,7 +45,7 @@ public class RequestFilter extends OncePerRequestFilter {
 			throws ServletException, IOException {
 
 		final String requestTokenHeader = request.getHeader("Authorization");
-		requestLogger(request) ;
+		//requestLogger(request) ;
    
 		String username = null;
 		String jwtToken = null;
@@ -84,7 +84,7 @@ public class RequestFilter extends OncePerRequestFilter {
 	}
 	
 	private void requestLogger(HttpServletRequest request) {
-		  // Create a StringBuilder to hold the request information
+		 // Create a StringBuilder to hold the request information
         StringBuilder requestInfo = new StringBuilder();
        
         // Append request method and URL

@@ -28,6 +28,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
+import javax.transaction.Transactional;
+
 @Service("policyService")
 public class PolicyService {
 	private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -44,7 +46,11 @@ public class PolicyService {
 	@Autowired
 	private PolicyRepository policyRepository;
 
+    /*
+     * this async method will be executed using the taskExecutor bean.
+     */
 	@Async
+	 @Transactional
 	public CompletableFuture<ProductPolicy> issuePolicy(String policyHolderName, String productType, String age,
 			String healthStatus) {
 		return CompletableFuture.supplyAsync(() -> {
@@ -80,6 +86,42 @@ public class PolicyService {
 			return new ProductPolicy(policyId, policyHolderName, productType);
 		});
 	}
+	
+	
+
+	public ProductPolicy issueSyncPolicy(String policyHolderName, String productType, String age,
+			String healthStatus) {
+		double price = 0L;
+
+		// get price
+		price = priceService.calculatePrice(productType, Integer.parseInt(age), Double.parseDouble(healthStatus));
+		
+		 if (price == -1) {
+
+	            throw new ResourceNotFoundException("Invalid product type " + productType);
+	        }
+
+		// Generate policy ID
+		long timestamp = System.currentTimeMillis();
+        String uuid = UUID.randomUUID().toString();
+        String policyId="POL" + timestamp + "-" + uuid;
+
+		RequestProcess safRequest = new RequestProcess();
+		safRequest.setStatus("PENDING");
+		safRequest.setMessage("<request><policy><policyId>" + policyId + "</policyId><policyHolderName>"
+				+ policyHolderName + "</policyHolderName><price>" + price + "</price><<policyType>" + productType
+				+ "</policyType></>policy</request>");
+		requestRepository.saveAndFlush(safRequest);
+
+		LivePolicy livePolicy = new LivePolicy();
+		livePolicy.setPolicyId(policyId);
+		livePolicy.setPolicyHolderAge(age);
+		livePolicy.setPolicyHolderName(policyHolderName);
+		livePolicy.setHealthFactor(healthStatus);
+		livePolicy.setProduct(new Product(productType, price, ""));
+		coreService.callSyncExternalSystemSaf(safRequest.getId(), livePolicy);
+		return new ProductPolicy(policyId, policyHolderName, productType);
+	}
 
 	public Policy findPolicyById(String policyId) {
 		Policy existingPolicy = policyRepository.findByPolicyId(policyId);
@@ -96,6 +138,7 @@ public class PolicyService {
 		return policyRepository.findByStatus("ACTV");
 	}
 
+	 @Transactional
 	public Policy deletePolicy(String policyId) {
 		Policy existingPolicy = policyRepository.findByPolicyId(policyId);
 				
@@ -106,10 +149,11 @@ public class PolicyService {
 		return existingPolicy;
 	}
 
-	public Policy updatePolicy(UpdatePolicyRequest updateRequest) {
-		Policy existingPolicy = policyRepository.findByPolicyId(updateRequest.getPolicyId());
+	 @Transactional
+	public Policy updatePolicy(String policyId,UpdatePolicyRequest updateRequest) {
+		Policy existingPolicy = policyRepository.findByPolicyId(policyId);
 		if(existingPolicy==null) {
-			throw new ResourceNotFoundException("Policy not found with id: " + updateRequest.getPolicyId());
+			throw new ResourceNotFoundException("Policy not found with id: " + policyId);
 		}		
 		existingPolicy.setPolicyHolderName(updateRequest.getPolicyHolderName());
 		existingPolicy.setProductType(updateRequest.getProductType());
@@ -119,4 +163,29 @@ public class PolicyService {
 		return existingPolicy;
 	}
 
+	    @Transactional
+	    public Policy patchPolicy(String policyId,UpdatePolicyRequest updateRequest) {
+	        Policy existingPolicy = policyRepository.findByPolicyId(policyId);
+	        if (existingPolicy == null) {
+	            throw new ResourceNotFoundException("Policy not found with id: " + updateRequest.getPolicyId());
+	        }
+
+	        if (updateRequest.getPolicyHolderName() != null) {
+	            existingPolicy.setPolicyHolderName(updateRequest.getPolicyHolderName());
+	        }
+	        if (updateRequest.getProductType() != null) {
+	            existingPolicy.setProductType(updateRequest.getProductType());
+	        }
+	        if (updateRequest.getAge() != null) {
+	            existingPolicy.setAge(updateRequest.getAge());
+	        }
+	        if (updateRequest.getHealthStatus() != null) {
+	            existingPolicy.setHealthFactor(updateRequest.getHealthStatus());
+	        }
+
+	        policyRepository.save(existingPolicy);
+	        return existingPolicy;
+	    }
+	
+	
 }

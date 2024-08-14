@@ -13,10 +13,15 @@ public class AsyncConfig {
     @Bean(name = "taskExecutor")
     public Executor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(100);
-        executor.setMaxPoolSize(100);
-        executor.setQueueCapacity(500);
-        executor.setThreadNamePrefix("Async gs-api Thread - ");
+        //keep alive thread
+        executor.setCorePoolSize(5000);
+        //max thread in pool
+        executor.setMaxPoolSize(5000);
+        //number of queue used to hold task
+
+        // Set thread keep-alive time
+        executor.setKeepAliveSeconds(40); // Adjust based on expected task durations
+        executor.setThreadNamePrefix("async-thread - ");
         executor.initialize();
         return executor;
     }

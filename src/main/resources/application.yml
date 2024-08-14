@@ -36,6 +36,36 @@ api:
 jwt:
    secret: secretkey
    
+
+resilience4j:
+  retry:
+    instances:
+      myRetry:
+        maxAttempts: 5
+        waitDuration: 1s
+  circuitbreaker:
+    instances:
+      myCircuitBreaker:
+        registerHealthIndicator: true
+        slidingWindowSize: 100
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 60s
+        slowCallDurationThreshold: 180s
+        slowCallRateThreshold: 50
+        
+#logging.level.org.springframework.security=TRACE        
+logging:
+ level:
+  org:
+   springframework:
+    security: INFO 
+  com:
+                   
+ file:
+    name: norirman.log
+
+   
    
 
   

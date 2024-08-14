@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import com.gs.api.db.entity.AuthUser;
 import com.gs.api.db.repositories.AuthUserRepository;
+import com.gs.api.exception.UserAuthenticationException;
 
 
 
@@ -37,6 +38,7 @@ public class AuthenticationService implements UserDetailsService {
 	@Qualifier(value = "boTransactionManager")
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		AuthUser usr=userRepository.findByUsername(username);
+		if(usr!=null) {
 		String dbuser=usr.getUsername();
 		String dbpassword=usr.getPassword();
 			
@@ -48,6 +50,10 @@ public class AuthenticationService implements UserDetailsService {
 					new ArrayList<>());
 		} else {
 			throw new UsernameNotFoundException("User not found with username: " + username);
+		
+		}
+		}else {
+			throw new UserAuthenticationException("User not found with username "+username);
 		}
 	}
 	
